@@ -56,3 +56,8 @@ docker images
 
 That's all!
 
+**Reading materials:**
+
+- [How to Use Your Own Registry](https://www.docker.com/blog/how-to-use-your-own-registry-2/)
+- [Self hosted Docker registry](https://blog.aawadia.dev/2022/11/02/docker-registry-ci/)
+
