@@ -1,20 +1,22 @@
 # Adapted from https://blog.aawadia.dev/2022/11/02/docker-registry-ci/
-# Is meant to be run locally
 
 services:
   registry:
-    image: registry:2.8.3
+    image: registry:3
     container_name: registry
     restart: unless-stopped
     environment:
-    #   REGISTRY_AUTH: htpasswd
-    #   REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
-    #   REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password
-      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
-    #   REGISTRY_HTTP_HOST: "https://registry.xyz.io" # your domain name here
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      # Not required since TLS termination is done in nginx
+      # REGISTRY_HTTP_TLS_CERTIFICATE: /certs/cert.pem
+      # REGISTRY_HTTP_TLS_KEY: /certs/key.pem
+      # REGISTRY_HTTP_HOST: "https://docker.legalspace.id"
     volumes:
-      # - ./datadir/registry.password:/auth/registry.password
-      - ./datadir/data:/data
+      - ./datadir/htpasswd:/auth/htpasswd
+      - ./datadir/data:/var/lib/registry
     ports:
       - 5000:5000
 
