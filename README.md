@@ -2,16 +2,13 @@
 
 This is a simple registry container configuration meant to self-host your docker images.
 Useful if your docker image is bigger than what is available on your registry's free plan, and you have a spare server to use instead.
-Configuration for local use and internet use (via nginx reverse proxy and cloudflare Origin Certificate) is available.
+Configuration for local use and internet use (via a nginx reverse proxy) is available.
 
-## Use behind an nginx reverse proxy + Cloudflare Origin Certificate
+## Use behind an nginx reverse proxy
 
-You would have to configure your nginx to use reverse proxy, and to use proxied connection in Cloudflare DNS.
+You would have to configure your nginx to use reverse proxy.
 
-First you should have a cloudflare account and use its free DNS services.
-For that you would need to refer to cloudflare documentations.
-You need to set up proxied DNS in cloudflare and configure authenticated origin pulls.
-
+First you should have a TLS certificate solution.
 Secondly, you would need to set a `htpasswd` file to hold your credentials.
 To obtain a htpasswd file, you can run:[^basicauth]
 
@@ -43,12 +40,15 @@ server {
     listen 443 ssl http2;
     server_name docker.domain.tld; # replace with your actual (sub)domain
 
-    # Cloudflare origin certificates and keys
-    ssl_certificate         /etc/cloudflare/domain.tld/cert.pem;
-    ssl_certificate_key     /etc/cloudflare/domain.tld/key.pem;
+    # Certificate parameters, eg. let's encrypt
+    ssl_certificate         /etc/letsencrypt/live/docker.domain.tld/cert.pem;
+    ssl_certificate_key     /etc/letsencrypt/live/docker.domain.tld/key.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    
+    # docker images can be quite big
+    client_max_body_size 5G;
 
-    # Cloudflare authenticated origin pulls configuration
-    ssl_client_certificate /etc/cloudflare/cloudflare.crt;
     ssl_verify_client on;
     location / {
         # Our registry docker container runs on port 5000
